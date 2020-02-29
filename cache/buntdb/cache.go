@@ -1,4 +1,4 @@
-package cache_file
+package cache
 
 import (
 	"encoding/json"
@@ -96,7 +96,7 @@ func (connect *fileCacheConnect) Close() error {
 //查询缓存，
 func (connect *fileCacheConnect) Read(key string) (Any, error) {
 	if connect.db == nil {
-		return nil, errors.New("[会话]连接失败")
+		return nil, errors.New("[缓存]连接失败")
 	}
 
 	realKey := connect.config.Prefix + key
@@ -126,7 +126,7 @@ func (connect *fileCacheConnect) Read(key string) (Any, error) {
 //更新缓存
 func (connect *fileCacheConnect) Write(key string, val Any, expires ...time.Duration) error {
 	if connect.db == nil {
-		return errors.New("[会话]连接失败")
+		return errors.New("[缓存]连接失败")
 	}
 
 	value := fileCacheValue{val}
@@ -159,7 +159,7 @@ func (connect *fileCacheConnect) Write(key string, val Any, expires ...time.Dura
 //查询缓存，
 func (connect *fileCacheConnect) Exists(key string) (bool, error) {
 	if connect.db == nil {
-		return false, errors.New("[会话]连接失败")
+		return false, errors.New("[缓存]连接失败")
 	}
 
 	realKey := connect.config.Prefix + key
