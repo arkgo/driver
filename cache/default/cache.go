@@ -15,11 +15,14 @@ import (
 type (
 	defaultCacheDriver  struct{}
 	defaultCacheConnect struct {
-		mutex  sync.RWMutex
-		name   string
-		config ark.CacheConfig
-		expiry time.Duration
-		caches sync.Map
+		mutex   sync.RWMutex
+		name    string
+		config  ark.CacheConfig
+		setting defaultCacheSetting
+		caches  sync.Map
+	}
+	defaultCacheSetting struct {
+		Expiry time.Duration
 	}
 	defaultCacheValue struct {
 		Value  Any
@@ -29,17 +32,20 @@ type (
 
 //连接
 func (driver *defaultCacheDriver) Connect(name string, config ark.CacheConfig) (ark.CacheConnect, error) {
-	expiry := time.Hour * 24 * 7 //默认7天有效
+
+	setting := defaultCacheSetting{
+		Expiry: time.Second * 60,
+	}
 	if config.Expiry != "" {
-		du, err := util.ParseDuration(config.Expiry)
-		if err != nil {
-			expiry = du
+		expiry, err := util.ParseDuration(config.Expiry)
+		if err == nil {
+			setting.Expiry = expiry
 		}
 	}
 
 	return &defaultCacheConnect{
-		name: name, config: config,
-		expiry: expiry, caches: sync.Map{},
+		name: name, config: config, setting: setting,
+		caches: sync.Map{},
 	}, nil
 }
 
@@ -79,7 +85,7 @@ func (connect *defaultCacheConnect) Write(key string, val Any, expires ...time.D
 	now := time.Now()
 
 	value := defaultCacheValue{
-		Value: val, Expiry: now.Add(connect.expiry),
+		Value: val, Expiry: now.Add(connect.setting.Expiry),
 	}
 	if len(expires) > 0 {
 		value.Expiry = now.Add(expires[0])

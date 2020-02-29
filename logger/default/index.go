@@ -4,34 +4,16 @@ import (
 	"github.com/arkgo/ark"
 )
 
-func Driver() ark.LoggerDriver {
-	return &defaultLoggerDriver{}
+func Driver(ss ...string) ark.LoggerDriver {
+	s := ""
+	if len(ss) > 0 {
+		s = ss[0]
+	}
+	return &defaultLoggerDriver{s}
 }
 
 func init() {
 	ark.Driver("default", Driver())
+	ark.Driver("console", Driver())
+	ark.Driver("file", Driver("store/logs"))
 }
-
-// func tostring(v Any) string {
-// 	s := ""
-
-// 	if m, ok := v.(Map); ok {
-// 		vs := []string{}
-// 		for k, v := range m {
-// 			vs = append(vs, k, fmt.Sprintf("%v", v))
-// 		}
-// 		s = strings.Join(vs, " ")
-// 	} else if ms, ok := v.([]Map); ok {
-// 		vs := []string{}
-// 		for _, m := range ms {
-// 			for k, v := range m {
-// 				vs = append(vs, k, fmt.Sprintf("%v", v))
-// 			}
-// 		}
-// 		s = strings.Join(vs, " ")
-// 	} else {
-// 		s = fmt.Sprintf("%v", v)
-// 	}
-
-// 	return s
-// }

@@ -15,8 +15,11 @@ type (
 	defaultSessionConnect struct {
 		name     string
 		config   ark.SessionConfig
-		expiry   time.Duration
+		setting  defaultSessionSetting
 		sessions sync.Map
+	}
+	defaultSessionSetting struct {
+		Expiry time.Duration
 	}
 	defaultSessionValue struct {
 		Value  Map
@@ -26,16 +29,19 @@ type (
 
 //连接
 func (driver *defaultSessionDriver) Connect(name string, config ark.SessionConfig) (ark.SessionConnect, error) {
-	expiry := time.Hour * 24 * 7 //默认7天有效
+
+	setting := defaultSessionSetting{
+		Expiry: time.Hour * 24 * 7,
+	}
 	if config.Expiry != "" {
-		du, err := util.ParseDuration(config.Expiry)
-		if err != nil {
-			expiry = du
+		expiry, err := util.ParseDuration(config.Expiry)
+		if err == nil {
+			setting.Expiry = expiry
 		}
 	}
 
 	return &defaultSessionConnect{
-		name: name, config: config, expiry: expiry,
+		name: name, config: config, setting: setting,
 		sessions: sync.Map{},
 	}, nil
 }
@@ -76,7 +82,7 @@ func (connect *defaultSessionConnect) Write(id string, val Map, expires ...time.
 	now := time.Now()
 
 	value := defaultSessionValue{
-		Value: val, Expiry: now.Add(connect.expiry),
+		Value: val, Expiry: now.Add(connect.setting.Expiry),
 	}
 	if len(expires) > 0 {
 		value.Expiry = now.Add(expires[0])

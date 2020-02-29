@@ -63,22 +63,24 @@ func (connect *defaultBusConnect) Start() error {
 	return nil
 }
 
-func (connect *defaultBusConnect) Publish(name string, data []byte) error {
-	return bus.Publish(name, data)
-}
-func (connect *defaultBusConnect) DeferredPublish(name string, data []byte, delay time.Duration) error {
-	time.AfterFunc(delay, func() {
-		bus.Publish(name, data)
-	})
+func (connect *defaultBusConnect) Publish(name string, data []byte, delays ...time.Duration) error {
+	if len(delays) > 0 {
+		time.AfterFunc(delays[0], func() {
+			bus.Publish(name, data)
+		})
+	} else {
+		return bus.Publish(name, data)
+	}
 	return nil
 }
-func (connect *defaultBusConnect) Enqueue(name string, data []byte) error {
-	return bus.Enqueue(name, data)
-}
-func (connect *defaultBusConnect) DeferredEnqueue(name string, data []byte, delay time.Duration) error {
-	time.AfterFunc(delay, func() {
-		bus.Enqueue(name, data)
-	})
+func (connect *defaultBusConnect) Enqueue(name string, data []byte, delays ...time.Duration) error {
+	if len(delays) > 0 {
+		time.AfterFunc(delays[0], func() {
+			bus.Enqueue(name, data)
+		})
+	} else {
+		return bus.Enqueue(name, data)
+	}
 	return nil
 }
 
