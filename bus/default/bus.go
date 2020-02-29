@@ -1,0 +1,90 @@
+package bus
+
+import (
+	"sync"
+	"time"
+
+	"github.com/arkgo/ark"
+)
+
+//------------------------- 默认队列驱动 begin --------------------------
+
+type (
+	defaultBusDriver  struct{}
+	defaultBusConnect struct {
+		mutex   sync.RWMutex
+		running bool
+		actives int64
+
+		name   string
+		config ark.BusConfig
+	}
+)
+
+//连接
+func (driver *defaultBusDriver) Connect(name string, config ark.BusConfig) (ark.BusConnect, error) {
+	return &defaultBusConnect{
+		name: name, config: config,
+	}, nil
+}
+
+//打开连接
+func (connect *defaultBusConnect) Open() error {
+	return nil
+}
+func (connect *defaultBusConnect) Health() (ark.BusHealth, error) {
+	connect.mutex.RLock()
+	defer connect.mutex.RUnlock()
+	return ark.BusHealth{Workload: connect.actives}, nil
+}
+
+//关闭连接
+func (connect *defaultBusConnect) Close() error {
+	bus.stopper.Stop()
+	return nil
+}
+
+func (connect *defaultBusConnect) Event(channel string, handler ark.BusHandler) error {
+	return bus.Event(channel, handler)
+}
+func (connect *defaultBusConnect) Queue(channel string, thread int, handler ark.BusHandler) error {
+	if thread <= 0 {
+		thread = 1
+	}
+	return bus.Queue(channel, thread, handler)
+}
+
+//开始订阅者
+func (connect *defaultBusConnect) Start() error {
+	connect.mutex.Lock()
+	defer connect.mutex.Unlock()
+
+	connect.running = true
+	return nil
+}
+
+func (connect *defaultBusConnect) Publish(name string, data []byte) error {
+	return bus.Publish(name, data)
+}
+func (connect *defaultBusConnect) DeferredPublish(name string, data []byte, delay time.Duration) error {
+	time.AfterFunc(delay, func() {
+		bus.Publish(name, data)
+	})
+	return nil
+}
+func (connect *defaultBusConnect) Enqueue(name string, data []byte) error {
+	return bus.Enqueue(name, data)
+}
+func (connect *defaultBusConnect) DeferredEnqueue(name string, data []byte, delay time.Duration) error {
+	time.AfterFunc(delay, func() {
+		bus.Enqueue(name, data)
+	})
+	return nil
+}
+
+//执行统一到这里
+//func (connect *defaultBusConnect) serve(name string, value Map) {
+//	connect.request("", name, value)
+//}
+
+//------------------------- 默认队列驱动 end --------------------------
