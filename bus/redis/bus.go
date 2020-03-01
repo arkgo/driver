@@ -1,22 +1,23 @@
 package bus_redis
 
 import (
-	"arkgo/ark"
-	. "arkgo/asset"
-	"arkgo/asset/util"
-	"github.com/gomodule/redigo/redis"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/arkgo/ark"
+	"github.com/arkgo/asset/util"
+	. "github.com/arkgo/base"
+	"github.com/gomodule/redigo/redis"
 )
 
 //------------------------- 默认队列驱动 begin --------------------------
 
 type (
-	redisBusDriver  struct{}
-	redisBusQueue struct {
-		Thread	int
-		Handler	ark.BusHandler
+	redisBusDriver struct{}
+	redisBusQueue  struct {
+		Thread  int
+		Handler ark.BusHandler
 	}
 	redisBusConnect struct {
 		mutex   sync.RWMutex
@@ -153,7 +154,7 @@ func (connect *redisBusConnect) Close() error {
 		//结束事件
 		connect.Publish(connect.eventCloser, []byte{})
 		//结束队列
-		for k,_ := range connect.queues {
+		for k, _ := range connect.queues {
 			connect.Enqueue(k, []byte{})
 		}
 
@@ -259,9 +260,9 @@ func (connect *redisBusConnect) Start() error {
 	//监听事件
 	connect.eventStopper.RunWorker(connect.eventing)
 	//监听队列
-	for k,v := range connect.queues {
+	for k, v := range connect.queues {
 		name := k
-		for i:=0;i<v.Thread;i++ {
+		for i := 0; i < v.Thread; i++ {
 			connect.queueStopper.RunWorker(func() {
 				connect.queueing(name)
 			})
@@ -278,7 +279,7 @@ func (connect *redisBusConnect) eventing() {
 		connect.config.Prefix + connect.eventCloser,
 	}
 	for name, _ := range connect.events {
-		names = append(names, connect.config.Prefix + name)
+		names = append(names, connect.config.Prefix+name)
 	}
 
 	conn := connect.client.Get()

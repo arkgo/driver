@@ -1,7 +1,7 @@
 package bus_redis
 
 import (
-	"arkgo/ark"
+	"github.com/arkgo/ark"
 )
 
 func Driver() ark.BusDriver {
