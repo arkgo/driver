@@ -86,9 +86,9 @@ func (driver *redisBusDriver) Connect(name string, config ark.BusConfig) (ark.Bu
 		}
 	}
 
-	if config.Thread <= 0 {
-		config.Thread = 20 //默认100个线程执行队列
-	}
+	// if config.Thread <= 0 {
+	// 	config.Thread = 20 //默认100个线程执行队列
+	// }
 
 	return &redisBusConnect{
 		name: name, config: config, setting: setting,
@@ -141,10 +141,10 @@ func (connect *redisBusConnect) Open() error {
 	defer conn.Close()
 	return conn.Err()
 }
-func (connect *redisBusConnect) Health() (*ark.BusHealth, error) {
+func (connect *redisBusConnect) Health() (ark.BusHealth, error) {
 	connect.mutex.RLock()
 	defer connect.mutex.RUnlock()
-	return &ark.BusHealth{Workload: connect.actives}, nil
+	return ark.BusHealth{Workload: connect.actives}, nil
 }
 
 //关闭连接
@@ -153,9 +153,9 @@ func (connect *redisBusConnect) Close() error {
 
 		//结束事件
 		connect.Publish(connect.eventCloser, []byte{})
-		//结束队列
+		//结束队列，待优化
 		for k, _ := range connect.queues {
-			connect.Enqueue(k, []byte{})
+			connect.Enqueue(k+connect.queueCloser, []byte{})
 		}
 
 		connect.client.Close()
@@ -218,7 +218,6 @@ func (connect *redisBusConnect) Publish(name string, data []byte, delays ...time
 		return ark.Fail
 	}
 
-	//再转成json
 	conn := connect.client.Get()
 	defer conn.Close()
 
@@ -291,10 +290,10 @@ func (connect *redisBusConnect) eventing() {
 	for {
 		switch rec := psc.Receive().(type) {
 		case redis.Message:
-			if rec.Channel == connect.eventCloser {
+			channel := strings.Replace(rec.Channel, connect.config.Prefix, "", 1)
+			if channel == connect.eventCloser {
 				break //这里退出
 			} else {
-				channel := strings.Replace(rec.Channel, connect.config.Prefix, "", 1)
 				if call, ok := connect.events[channel]; ok {
 					go call(channel, rec.Data)
 				}
@@ -316,7 +315,7 @@ func (connect *redisBusConnect) eventing() {
 //待处理，要支持单队列多个线程
 func (connect *redisBusConnect) queueing(name string) {
 	names := []Any{
-		connect.config.Prefix + connect.queueCloser,
+		connect.config.Prefix + name + connect.queueCloser,
 		connect.config.Prefix + name,
 	}
 	//for name, _ := range connect.queues {
@@ -331,7 +330,6 @@ func (connect *redisBusConnect) queueing(name string) {
 
 	for {
 		bytes, _ := redis.ByteSlices(conn.Do("BRPOP", names...))
-
 		if bytes != nil && len(bytes) >= 2 {
 			channel := strings.Replace(string(bytes[0]), connect.config.Prefix, "", 1)
 			data := bytes[1]

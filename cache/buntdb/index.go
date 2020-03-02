@@ -5,7 +5,7 @@ import (
 )
 
 func Driver(ss ...string) ark.CacheDriver {
-	store := ":memory:"
+	store := ""
 	if len(ss) > 0 {
 		store = ss[0]
 	}
@@ -14,6 +14,6 @@ func Driver(ss ...string) ark.CacheDriver {
 
 func init() {
 	ark.Driver("buntdb", Driver())
-	ark.Driver("memory", Driver())
-	ark.Driver("file", Driver(""))
+	ark.Driver("file", Driver())
+	ark.Driver("memory", Driver(":memory:"))
 }

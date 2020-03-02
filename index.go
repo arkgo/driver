@@ -7,4 +7,5 @@ import (
 	_ "github.com/arkgo/driver/logger"
 	_ "github.com/arkgo/driver/mutex"
 	_ "github.com/arkgo/driver/session"
+	_ "github.com/arkgo/driver/store"
 )
