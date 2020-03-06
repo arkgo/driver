@@ -1,7 +1,6 @@
 package cache_redis
 
 import (
-	"encoding/json"
 	"errors"
 	"sync"
 	"time"
@@ -221,7 +220,7 @@ func (connect *redisCacheConnect) Read(key string) (Any, error) {
 	}
 
 	realVal := redisCacheValue{}
-	err = json.Unmarshal([]byte(strVal), &realVal)
+	err = ark.Unmarshal([]byte(strVal), &realVal)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +244,7 @@ func (connect *redisCacheConnect) Write(key string, val Any, expires ...time.Dur
 		expiry = expires[0]
 	}
 
-	bytes, err := json.Marshal(realVal)
+	bytes, err := ark.Marshal(realVal)
 	if err != nil {
 		return err
 	}

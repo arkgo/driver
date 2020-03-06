@@ -1,7 +1,6 @@
 package session_redis
 
 import (
-	"encoding/json"
 	"errors"
 	"time"
 
@@ -165,7 +164,7 @@ func (connect *redisSessionConnect) Read(id string) (Map, error) {
 	}
 
 	m := Map{}
-	err = json.Unmarshal([]byte(val), &m)
+	err = ark.Unmarshal([]byte(val), &m)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +186,7 @@ func (connect *redisSessionConnect) Write(id string, value Map, expires ...time.
 	key := connect.config.Prefix + id
 
 	//JSON解析
-	bytes, err := json.Marshal(value)
+	bytes, err := ark.Marshal(value)
 	if err != nil {
 		return err
 	}

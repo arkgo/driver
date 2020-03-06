@@ -1,7 +1,6 @@
 package session
 
 import (
-	"encoding/json"
 	"errors"
 	"sync"
 	"time"
@@ -115,7 +114,7 @@ func (connect *fileSessionConnect) Read(id string) (Map, error) {
 	}
 
 	value := Map{}
-	err = json.Unmarshal([]byte(realVal), &value)
+	err = ark.Unmarshal([]byte(realVal), &value)
 	if err != nil {
 		return nil, nil
 	}
@@ -130,7 +129,7 @@ func (connect *fileSessionConnect) Write(key string, val Map, expires ...time.Du
 	}
 
 	//JSON解析
-	bytes, err := json.Marshal(val)
+	bytes, err := ark.Marshal(val)
 	if err != nil {
 		return err
 	}

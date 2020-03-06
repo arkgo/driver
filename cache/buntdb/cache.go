@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"encoding/json"
 	"errors"
 	"sync"
 	"time"
@@ -115,7 +114,7 @@ func (connect *fileCacheConnect) Read(key string) (Any, error) {
 	}
 
 	mcv := fileCacheValue{}
-	err = json.Unmarshal([]byte(realVal), &mcv)
+	err = ark.Unmarshal([]byte(realVal), &mcv)
 	if err != nil {
 		return nil, nil
 	}
@@ -132,7 +131,7 @@ func (connect *fileCacheConnect) Write(key string, val Any, expires ...time.Dura
 	value := fileCacheValue{val}
 
 	//JSON解析
-	bytes, err := json.Marshal(value)
+	bytes, err := ark.Marshal(value)
 	if err != nil {
 		return err
 	}

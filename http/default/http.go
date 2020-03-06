@@ -3,10 +3,10 @@ package http_default
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 	"sync"
 	"time"
+	"net/http"
 
 	"github.com/arkgo/ark"
 	. "github.com/arkgo/base"
@@ -182,7 +182,7 @@ func (connect *defaultHttpConnect) Start() error {
 
 	go func() {
 		err := connect.server.ListenAndServe()
-		if err != nil {
+		if err != nil && err != http.ErrServerClosed {
 			panic(err.Error())
 		}
 	}()
@@ -196,7 +196,7 @@ func (connect *defaultHttpConnect) StartTLS(certFile, keyFile string) error {
 
 	go func() {
 		err := connect.server.ListenAndServeTLS(certFile, keyFile)
-		if err != nil {
+		if err != nil && err != http.ErrServerClosed {
 			panic(err.Error())
 		}
 	}()

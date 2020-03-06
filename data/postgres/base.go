@@ -2,7 +2,6 @@ package data_postgres
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -455,7 +454,7 @@ func (base *PostgresBase) packing(value Map) Map {
 			}
 		case Map:
 			{
-				b, e := json.Marshal(t)
+				b, e := ark.Marshal(t)
 				if e == nil {
 					newValue[k] = string(b)
 				} else {
@@ -471,7 +470,7 @@ func (base *PostgresBase) packing(value Map) Map {
 				//
 				//newValue[k] = fmt.Sprintf("{%s}", strings.Join(ms, ","))
 
-				b, e := json.Marshal(t)
+				b, e := ark.Marshal(t)
 				if e == nil {
 					newValue[k] = string(b)
 				} else {

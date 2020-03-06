@@ -2,7 +2,6 @@ package view_default
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -391,7 +390,7 @@ func (parser *defaultViewParser) layoutHelper(name string, vals ...Any) string {
 			args = append(args, t)
 		case string:
 			m := Map{}
-			e := json.Unmarshal([]byte(t), &m)
+			e := ark.Unmarshal([]byte(t), &m)
 			if e == nil {
 				args = append(args, m)
 			}
@@ -429,7 +428,7 @@ func (parser *defaultViewParser) renderHelper(name string, vals ...Any) template
 	for _, v := range vals {
 		if t, ok := v.(string); ok {
 			m := Map{}
-			e := json.Unmarshal([]byte(t), &m)
+			e := ark.Unmarshal([]byte(t), &m)
 			if e == nil {
 				args = append(args, m)
 			}
