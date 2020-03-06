@@ -156,25 +156,26 @@ func (connect *redisCacheConnect) Close() error {
 	return nil
 }
 
-func (connect *redisCacheConnect) Serial(key string, step int64) (int64, error) {
+func (connect *redisCacheConnect) Serial(key string, start, step int64) (int64, error) { //加并发锁
+	//加锁可以
+	connect.mutex.Lock()
+	defer connect.mutex.Unlock()
 
-	value := int64(0)
-	val, err := connect.Read(key)
-	if err != nil {
-		return int64(0), err
-	}
+	value := start
 
-	if vv, ok := val.(float64); ok {
-		value = int64(vv)
-	} else if vv, ok := val.(int64); ok {
-		value = vv
+	if val, err := connect.Read(key); err == nil {
+		if vv, ok := val.(float64); ok {
+			value = int64(vv)
+		} else if vv, ok := val.(int64); ok {
+			value = vv
+		}
 	}
 
 	//加数字
 	value += step
 
 	//写入值
-	err = connect.Write(key, value, 0)
+	err := connect.Write(key, value, 0)
 	if err != nil {
 		return int64(0), err
 	}
@@ -214,13 +215,16 @@ func (connect *redisCacheConnect) Read(key string) (Any, error) {
 
 	realKey := connect.config.Prefix + key
 
-	strVal, err := redis.String(conn.Do("GET", realKey))
+	val, err := redis.Bytes(conn.Do("GET", realKey))
 	if err != nil {
 		return nil, err
 	}
+	if val == nil {
+		return nil, nil
+	}
 
 	realVal := redisCacheValue{}
-	err = ark.Unmarshal([]byte(strVal), &realVal)
+	err = ark.Unmarshal(val, &realVal)
 	if err != nil {
 		return nil, err
 	}

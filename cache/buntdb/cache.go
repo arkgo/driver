@@ -109,6 +109,9 @@ func (connect *fileCacheConnect) Read(key string) (Any, error) {
 		realVal = vvv
 		return nil
 	})
+	if err == buntdb.ErrNotFound {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -189,27 +192,26 @@ func (connect *fileCacheConnect) Delete(key string) error {
 	})
 }
 
-func (connect *fileCacheConnect) Serial(key string, step int64) (int64, error) {
-	if connect.db == nil {
-		return int64(0), errors.New("连接失败")
-	}
+func (connect *fileCacheConnect) Serial(key string, start, step int64) (int64, error) {
+	//加并发锁
+	connect.mutex.Lock()
+	defer connect.mutex.Unlock()
 
-	value := int64(0)
-	val, err := connect.Read(key)
-	if err != nil {
-		return int64(0), err
-	}
-	if vv, ok := val.(float64); ok {
-		value = int64(vv)
-	} else if vv, ok := val.(int64); ok {
-		value = vv
+	value := start
+
+	if val, err := connect.Read(key); err == nil {
+		if vv, ok := val.(float64); ok {
+			value = int64(vv)
+		} else if vv, ok := val.(int64); ok {
+			value = vv
+		}
 	}
 
 	//加数字
 	value += step
 
 	//写入值，这个应该不过期
-	err = connect.Write(key, value, 0)
+	err := connect.Write(key, value, 0)
 	if err != nil {
 		return int64(0), err
 	}

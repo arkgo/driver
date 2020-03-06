@@ -113,24 +113,26 @@ func (connect *defaultCacheConnect) Delete(key string) error {
 	return nil
 }
 
-func (connect *defaultCacheConnect) Serial(key string, step int64) (int64, error) {
-	num := int64(0)
+func (connect *defaultCacheConnect) Serial(key string, start, step int64) (int64, error) {
+	value := start
 
-	if vv, err := connect.Read(key); err == nil {
-		if vvn, ok := vv.(int64); ok {
-			num = vvn
+	if val, err := connect.Read(key); err == nil {
+		if vv, ok := val.(float64); ok {
+			value = int64(vv)
+		} else if vv, ok := val.(int64); ok {
+			value = vv
 		}
 	}
 
-	num += step
+	value += step
 
 	//写入值
-	err := connect.Write(key, num)
+	err := connect.Write(key, value)
 	if err != nil {
 		return int64(0), err
 	}
 
-	return num, nil
+	return value, nil
 }
 
 func (connect *defaultCacheConnect) Keys(prefixs ...string) ([]string, error) {

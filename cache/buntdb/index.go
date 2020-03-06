@@ -13,7 +13,7 @@ func Driver(ss ...string) ark.CacheDriver {
 }
 
 func init() {
-	ark.Driver("buntdb", Driver())
-	ark.Driver("file", Driver())
+	ark.Driver("buntdb", Driver("store/cache.db"))
+	ark.Driver("file", Driver("store/cache.db"))
 	ark.Driver("memory", Driver(":memory:"))
 }
