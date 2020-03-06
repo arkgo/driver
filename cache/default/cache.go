@@ -34,7 +34,7 @@ type (
 func (driver *defaultCacheDriver) Connect(name string, config ark.CacheConfig) (ark.CacheConnect, error) {
 
 	setting := defaultCacheSetting{
-		Expiry: time.Second * 60,
+		Expiry: time.Minute * 30,
 	}
 	if config.Expiry != "" {
 		expiry, err := util.ParseDuration(config.Expiry)
@@ -66,8 +66,8 @@ func (connect *defaultCacheConnect) Close() error {
 
 //查询缓存，
 func (connect *defaultCacheConnect) Read(key string) (Any, error) {
-	realykey := connect.config.Prefix + key
-	if value, ok := connect.caches.Load(realykey); ok {
+	realkey := connect.config.Prefix + key
+	if value, ok := connect.caches.Load(realkey); ok {
 		if vv, ok := value.(defaultCacheValue); ok {
 			if vv.Expiry.Unix() > time.Now().Unix() {
 				return vv.Value, nil
@@ -91,8 +91,8 @@ func (connect *defaultCacheConnect) Write(key string, val Any, expires ...time.D
 		value.Expiry = now.Add(expires[0])
 	}
 
-	realykey := connect.config.Prefix + key
-	connect.caches.Store(realykey, value)
+	realkey := connect.config.Prefix + key
+	connect.caches.Store(realkey, value)
 
 	return nil
 }
