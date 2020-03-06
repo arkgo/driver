@@ -63,8 +63,9 @@ func (connect *defaultSessionConnect) Close() error {
 
 //查询会话，
 func (connect *defaultSessionConnect) Read(id string) (Map, error) {
-	realyid := connect.config.Prefix + id
-	if value, ok := connect.sessions.Load(realyid); ok {
+
+	realid := connect.config.Prefix + id
+	if value, ok := connect.sessions.Load(realid); ok {
 		if vv, ok := value.(defaultSessionValue); ok {
 			if vv.Expiry.Unix() > time.Now().Unix() {
 				return vv.Value, nil
@@ -88,8 +89,8 @@ func (connect *defaultSessionConnect) Write(id string, val Map, expires ...time.
 		value.Expiry = now.Add(expires[0])
 	}
 
-	realyid := connect.config.Prefix + id
-	connect.sessions.Store(realyid, value)
+	realid := connect.config.Prefix + id
+	connect.sessions.Store(realid, value)
 
 	return nil
 }
