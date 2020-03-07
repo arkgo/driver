@@ -513,7 +513,7 @@ func (base *PostgresBase) unpacking(keys []string, vals []interface{}) Map {
 //把MAP编译成sql查询条件
 func (base *PostgresBase) parsing(i int, args ...Any) (string, []interface{}, string, error) {
 
-	sql, val, odr, err := ark.Parse(args...)
+	sql, val, odr, err := ark.ParseSQL(args...)
 
 	if err != nil {
 		return "", nil, "", err

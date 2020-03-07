@@ -39,7 +39,7 @@ func (driver *redisSessionDriver) Connect(name string, config ark.SessionConfig)
 	setting := redisSessionSetting{
 		Server: "127.0.0.1:6379", Password: "", Database: "",
 		Idle: 30, Active: 100, Timeout: 240,
-		Expiry: time.Hour * 24 * 7, //默认7天有效
+		Expiry: time.Hour * 24 * 365, //默认7天有效
 	}
 
 	//默认超时时间
@@ -200,7 +200,7 @@ func (connect *redisSessionConnect) Write(id string, value Map, expires ...time.
 		key, string(bytes),
 	}
 	if expiry > 0 {
-		args = append(args, "EX", expiry.Seconds())
+		args = append(args, "EX", int(expiry.Seconds()))
 	}
 
 	_, err = conn.Do("SET", args...)
