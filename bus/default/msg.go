@@ -14,7 +14,7 @@ type (
 	defaultBus struct {
 		mutex   sync.Mutex
 		stopper *util.Stopper
-		events  map[string][]ark.BusHandler
+		events  map[string][]ark.EventHandler
 		queues  map[string]chan []byte
 	}
 	defaultBusFunc func(string, Map)
@@ -25,16 +25,16 @@ var (
 )
 
 func init() {
-	bus = &defaultBus{stopper: util.NewStopper(), events: make(map[string][]ark.BusHandler, 0), queues: make(map[string]chan []byte, 0)}
+	bus = &defaultBus{stopper: util.NewStopper(), events: make(map[string][]ark.EventHandler, 0), queues: make(map[string]chan []byte, 0)}
 }
 
 //订阅事件
-func (bus *defaultBus) Event(channel string, handler ark.BusHandler) error {
+func (bus *defaultBus) Event(channel string, handler ark.EventHandler) error {
 	bus.mutex.Lock()
 	defer bus.mutex.Unlock()
 
 	if _, ok := bus.events[channel]; ok == false {
-		bus.events[channel] = []ark.BusHandler{}
+		bus.events[channel] = make([]ark.EventHandler, 0)
 	}
 
 	//加入调用列表
@@ -44,7 +44,7 @@ func (bus *defaultBus) Event(channel string, handler ark.BusHandler) error {
 }
 
 //订阅队列
-func (bus *defaultBus) Queue(channel string, thread int, handler ark.BusHandler) error {
+func (bus *defaultBus) Queue(channel string, thread int, handler ark.QueueHandler) error {
 	bus.mutex.Lock()
 	defer bus.mutex.Unlock()
 

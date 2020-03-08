@@ -17,7 +17,7 @@ type (
 	redisBusDriver struct{}
 	redisBusQueue  struct {
 		Thread  int
-		Handler ark.BusHandler
+		Handler ark.QueueHandler
 	}
 	redisBusConnect struct {
 		mutex   sync.RWMutex
@@ -28,9 +28,12 @@ type (
 		config  ark.BusConfig
 		setting redisBusSetting
 
+		eventHandler ark.EventHandler
+		queueHandler ark.QueueHandler
+
 		client *redis.Pool
 
-		events       map[string]ark.BusHandler
+		events       map[string]ark.EventHandler
 		eventStopper *util.Stopper
 		eventCloser  string
 
@@ -92,7 +95,7 @@ func (driver *redisBusDriver) Connect(name string, config ark.BusConfig) (ark.Bu
 
 	return &redisBusConnect{
 		name: name, config: config, setting: setting,
-		events: make(map[string]ark.BusHandler, 0), eventStopper: util.NewStopper(), eventCloser: ark.Unique(config.Prefix),
+		events: make(map[string]ark.EventHandler, 0), eventStopper: util.NewStopper(), eventCloser: ark.Unique(config.Prefix),
 		queues: make(map[string]redisBusQueue, 0), queueStopper: util.NewStopper(), queueCloser: ark.Unique(config.Prefix),
 	}, nil
 }
@@ -164,34 +167,34 @@ func (connect *redisBusConnect) Close() error {
 }
 
 //注册回调
-//func (connect *redisBusConnect) Accept(handler ark.BusHandler) error {
-//	connect.mutex.Lock()
-//	defer connect.mutex.Unlock()
-//
-//	//保存回调
-//	connect.handler = handler
-//
-//	return nil
-//}
-
-//注册事件
-func (connect *redisBusConnect) Event(channel string, handler ark.BusHandler) error {
+func (connect *redisBusConnect) Accept(eventHandler ark.EventHandler, queueHandler ark.QueueHandler) error {
 	connect.mutex.Lock()
 	defer connect.mutex.Unlock()
-	connect.events[channel] = handler
+
+	connect.eventHandler = eventHandler
+	connect.queueHandler = queueHandler
+
+	return nil
+}
+
+//注册事件
+func (connect *redisBusConnect) Event(channel string) error {
+	connect.mutex.Lock()
+	defer connect.mutex.Unlock()
+	connect.events[channel] = connect.eventHandler
 	return nil
 }
 
 //注册队列
 //待处理，要支持单队列多个线程
-func (connect *redisBusConnect) Queue(channel string, thread int, handler ark.BusHandler) error {
+func (connect *redisBusConnect) Queue(channel string, thread int) error {
 	connect.mutex.Lock()
 	defer connect.mutex.Unlock()
 
 	if thread <= 0 {
 		thread = 1
 	}
-	connect.queues[channel] = redisBusQueue{thread, handler}
+	connect.queues[channel] = redisBusQueue{thread, connect.queueHandler}
 
 	return nil
 

@@ -18,6 +18,9 @@ type (
 
 		name   string
 		config ark.BusConfig
+
+		eventHandler ark.EventHandler
+		queueHandler ark.QueueHandler
 	}
 )
 
@@ -44,14 +47,24 @@ func (connect *defaultBusConnect) Close() error {
 	return nil
 }
 
-func (connect *defaultBusConnect) Event(channel string, handler ark.BusHandler) error {
-	return bus.Event(channel, handler)
+func (connect *defaultBusConnect) Accept(eventHandler ark.EventHandler, queueHandler ark.QueueHandler) error {
+	connect.mutex.Lock()
+	defer connect.mutex.Unlock()
+
+	connect.eventHandler = eventHandler
+	connect.queueHandler = queueHandler
+
+	return nil
 }
-func (connect *defaultBusConnect) Queue(channel string, thread int, handler ark.BusHandler) error {
+
+func (connect *defaultBusConnect) Event(channel string) error {
+	return bus.Event(channel, connect.eventHandler)
+}
+func (connect *defaultBusConnect) Queue(channel string, thread int) error {
 	if thread <= 0 {
 		thread = 1
 	}
-	return bus.Queue(channel, thread, handler)
+	return bus.Queue(channel, thread, connect.queueHandler)
 }
 
 //开始订阅者
