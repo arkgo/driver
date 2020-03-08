@@ -14,6 +14,7 @@ import (
 type (
 	defaultMutexDriver  struct{}
 	defaultMutexConnect struct {
+		name string
 		config  ark.MutexConfig
 		setting defaultMutexSetting
 		locks   sync.Map
@@ -26,7 +27,7 @@ type (
 	}
 )
 
-func (driver *defaultMutexDriver) Connect(config ark.MutexConfig) (ark.MutexConnect, error) {
+func (driver *defaultMutexDriver) Connect(name string, config ark.MutexConfig) (ark.MutexConnect, error) {
 
 	setting := defaultMutexSetting{
 		Expiry: time.Second * 3,
@@ -39,8 +40,7 @@ func (driver *defaultMutexDriver) Connect(config ark.MutexConfig) (ark.MutexConn
 	}
 
 	return &defaultMutexConnect{
-		config: config, setting: setting,
-		locks: sync.Map{},
+		name: name, config: config, setting: setting,
 	}, nil
 }
 
