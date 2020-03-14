@@ -9,5 +9,5 @@ func Driver() ark.StoreDriver {
 }
 
 func init() {
-	ark.Driver("ipcs", Driver())
+	ark.Register("ipcs", Driver())
 }

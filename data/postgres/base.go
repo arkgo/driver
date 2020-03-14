@@ -54,7 +54,7 @@ func (base *PostgresBase) trigger(name string, values ...Map) {
 }
 
 //查询表，支持多个KEY遍历
-func (base *PostgresBase) tableConfig(name string) Map {
+func (base *PostgresBase) tableConfig(name string) *ark.Table {
 	keys := []string{
 		fmt.Sprintf("%s.%s", base.name, name),
 		fmt.Sprintf("*.%s", name),
@@ -62,14 +62,14 @@ func (base *PostgresBase) tableConfig(name string) Map {
 	}
 
 	for _, key := range keys {
-		if cfg := ark.Table(key); cfg != nil {
+		if cfg := ark.GetTable(key); cfg != nil {
 			return cfg
 		}
 	}
 
 	return nil
 }
-func (base *PostgresBase) viewConfig(name string) Map {
+func (base *PostgresBase) viewConfig(name string) *ark.View {
 	keys := []string{
 		fmt.Sprintf("%s.%s", base.name, name),
 		fmt.Sprintf("*.%s", name),
@@ -77,14 +77,14 @@ func (base *PostgresBase) viewConfig(name string) Map {
 	}
 
 	for _, key := range keys {
-		if cfg := ark.View(key); cfg != nil {
+		if cfg := ark.GetView(key); cfg != nil {
 			return cfg
 		}
 	}
 
 	return nil
 }
-func (base *PostgresBase) modelConfig(name string) Map {
+func (base *PostgresBase) modelConfig(name string) *ark.Model {
 	keys := []string{
 		fmt.Sprintf("%s.%s", base.name, name),
 		fmt.Sprintf("*.%s", name),
@@ -92,7 +92,7 @@ func (base *PostgresBase) modelConfig(name string) Map {
 	}
 
 	for _, key := range keys {
-		if cfg := ark.Model(key); cfg != nil {
+		if cfg := ark.GetModel(key); cfg != nil {
 			return cfg
 		}
 	}
@@ -182,30 +182,27 @@ func (base *PostgresBase) Serial(key string, start, step int64) int64 {
 func (base *PostgresBase) Table(name string) ark.DataTable {
 	if config := base.tableConfig(name); config != nil {
 		//模式，表名
-		schema, table, key, fields := base.schema, name, "id", Map{}
-		if n, ok := config["schema"].(string); ok {
-			schema = n
+		schema, table, key := base.schema, name, "id"
+		if config.Schema != "" {
+			schema = config.Schema
 		}
-		if n, ok := config["table"].(string); ok {
-			table = n
+		if config.Table != "" {
+			table = config.Table
 		}
-		if n, ok := config["key"].(string); ok {
-			key = n
-		}
-		if n, ok := config["fields"].(Map); ok {
-			fields = n
+		if config.Key != "" {
+			key = config.Key
 		}
 
-		fff := Map{
-			"$count": Map{"type": "int", "must": nil, "name": "统计", "text": "统计"},
+		fields := ark.Params{
+			"$count": ark.Param{Type: "int", Require: false, Name: "统计"},
 		}
-		for k, v := range fields {
-			fff[k] = v
+		for k, v := range config.Fields {
+			fields[k] = v
 		}
 
 		table = strings.Replace(table, ".", "_", -1)
 		return &PostgresTable{
-			PostgresView{base, name, schema, table, key, fff},
+			PostgresView{base, name, schema, table, key, fields},
 		}
 	} else {
 		panic("[数据]表不存在")
@@ -217,30 +214,27 @@ func (base *PostgresBase) View(name string) ark.DataView {
 	if config := base.viewConfig(name); config != nil {
 
 		//模式，表名
-		schema, view, key, fields := base.schema, name, "id", Map{}
-		if n, ok := config["schema"].(string); ok {
-			schema = n
+		schema, view, key := base.schema, name, "id"
+		if config.Schema != "" {
+			schema = config.Schema
 		}
-		if n, ok := config["view"].(string); ok {
-			view = n
+		if config.View != "" {
+			view = config.View
 		}
-		if n, ok := config["key"].(string); ok {
-			key = n
-		}
-		if n, ok := config["fields"].(Map); ok {
-			fields = n
+		if config.Key != "" {
+			key = config.Key
 		}
 
-		fff := Map{
-			"$count": Map{"type": "int", "must": nil, "name": "统计", "text": "统计"},
+		fields := ark.Params{
+			"$count": ark.Param{Type: "int", Require: false, Name: "统计"},
 		}
-		for k, v := range fields {
-			fff[k] = v
+		for k, v := range config.Fields {
+			fields[k] = v
 		}
 
 		view = strings.Replace(view, ".", "_", -1)
 		return &PostgresView{
-			base, name, schema, view, key, fff,
+			base, name, schema, view, key, fields,
 		}
 	} else {
 		panic("[数据]视图不存在")
@@ -252,30 +246,24 @@ func (base *PostgresBase) Model(name string) ark.DataModel {
 	if config := base.modelConfig(name); config != nil {
 
 		//模式，表名
-		schema, model, key, fields := base.schema, name, "id", Map{}
-		if n, ok := config["schema"].(string); ok {
-			schema = n
+		schema, model, key := base.schema, name, "id"
+		if config.Model != "" {
+			model = config.Model
 		}
-		if n, ok := config["model"].(string); ok {
-			model = n
-		}
-		if n, ok := config["key"].(string); ok {
-			key = n
-		}
-		if n, ok := config["fields"].(Map); ok {
-			fields = n
+		if config.Key != "" {
+			key = config.Key
 		}
 
-		fff := Map{
-			"$count": Map{"type": "int", "must": nil, "name": "统计", "text": "统计"},
+		fields := ark.Params{
+			"$count": ark.Param{Type: "int", Require: false, Name: "统计"},
 		}
-		for k, v := range fields {
-			fff[k] = v
+		for k, v := range config.Fields {
+			fields[k] = v
 		}
 
 		model = strings.Replace(model, ".", "_", -1)
 		return &PostgresModel{
-			base, name, schema, model, key, fff,
+			base, name, schema, model, key, fields,
 		}
 	} else {
 		panic("[数据]模型不存在")

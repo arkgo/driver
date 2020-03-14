@@ -9,5 +9,5 @@ func Driver() ark.BusDriver {
 }
 
 func init() {
-	ark.Driver("redis", Driver())
+	ark.Register("redis", Driver())
 }

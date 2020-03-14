@@ -9,5 +9,5 @@ func Driver() ark.SessionDriver {
 }
 
 func init() {
-	ark.Driver("redis", Driver())
+	ark.Register("redis", Driver())
 }

@@ -13,7 +13,7 @@ func Driver(ss ...string) ark.LoggerDriver {
 }
 
 func init() {
-	ark.Driver("default", Driver())
-	ark.Driver("console", Driver())
-	ark.Driver("file", Driver("store/logs"))
+	ark.Register("default", Driver())
+	ark.Register("console", Driver())
+	ark.Register("file", Driver("store/logs"))
 }

@@ -29,6 +29,6 @@ func Driver() ark.DataDriver {
 func init() {
 	driver := Driver()
 	for _, key := range DRIVERS {
-		ark.Driver(key, driver)
+		ark.Register(key, driver)
 	}
 }

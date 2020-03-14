@@ -13,7 +13,7 @@ func Driver(ss ...string) ark.SessionDriver {
 }
 
 func init() {
-	ark.Driver("buntdb", Driver())
-	ark.Driver("memory", Driver())
-	ark.Driver("file", Driver(""))
+	ark.Register("buntdb", Driver())
+	ark.Register("memory", Driver())
+	ark.Register("file", Driver(""))
 }

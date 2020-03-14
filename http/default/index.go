@@ -9,5 +9,5 @@ func Driver() ark.HttpDriver {
 }
 
 func init() {
-	ark.Driver("default", Driver())
+	ark.Register("default", Driver())
 }
