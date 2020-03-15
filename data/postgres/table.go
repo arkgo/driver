@@ -87,7 +87,7 @@ func (table *PostgresTable) Change(item Map, data Map) Map {
 	}
 
 	//记录修改时间
-	if table.fields["changed"] != nil && data["changed"] == nil {
+	if _, ok := table.fields["changed"]; ok && data["changed"] == nil {
 		data["changed"] = time.Now()
 	}
 
