@@ -142,11 +142,11 @@ func (connect *ipcsStoreConnect) Upload(target string, metadata Map) (ark.File, 
 		})
 
 		//目录
-		dir := ark.Filing(connect.name, cid, stat.Name(), stat.Size())
+		dir := ark.NewFile(connect.name, cid, stat.Name(), stat.Size())
 
 		files := ark.Files{}
 		for _, link := range obj.Links {
-			files = append(files, ark.Filing(connect.name, link.Hash, link.Name, int64(link.Size)))
+			files = append(files, ark.NewFile(connect.name, link.Hash, link.Name, int64(link.Size)))
 
 			//pin住文件
 			connect.client.Pin(link.Hash, &ipcsPinOpt{
@@ -193,7 +193,7 @@ func (connect *ipcsStoreConnect) Upload(target string, metadata Map) (ark.File, 
 			return nil, nil, err
 		}
 
-		ffff := ark.Filing(connect.name, hash, stat.Name(), stat.Size())
+		ffff := ark.NewFile(connect.name, hash, stat.Name(), stat.Size())
 
 		return ffff, nil, nil
 	}
