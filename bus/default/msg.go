@@ -4,8 +4,8 @@ import (
 	"sync"
 
 	"github.com/arkgo/ark"
+	. "github.com/arkgo/asset"
 	"github.com/arkgo/asset/util"
-	. "github.com/arkgo/base"
 )
 
 //------------------------- 默认队列驱动 begin --------------------------

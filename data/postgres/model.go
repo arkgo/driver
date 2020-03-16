@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/arkgo/ark"
-	. "github.com/arkgo/base"
+	. "github.com/arkgo/asset"
 )
 
 type (

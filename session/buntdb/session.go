@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/arkgo/ark"
+	. "github.com/arkgo/asset"
 	"github.com/arkgo/asset/util"
-	. "github.com/arkgo/base"
 	"github.com/tidwall/buntdb"
 )
 

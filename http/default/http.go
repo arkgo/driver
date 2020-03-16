@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/arkgo/ark"
-	. "github.com/arkgo/base"
+	. "github.com/arkgo/asset"
 	"github.com/gorilla/mux"
 )
 

@@ -3,7 +3,7 @@ package data_postgres
 import (
 	"database/sql"
 
-	. "github.com/arkgo/base"
+	. "github.com/arkgo/asset"
 )
 
 type (

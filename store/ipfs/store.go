@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	. "github.com/arkgo/base"
+	. "github.com/arkgo/asset"
 
 	"github.com/arkgo/ark"
 	ipfs "github.com/ipfs/go-ipfs-api"

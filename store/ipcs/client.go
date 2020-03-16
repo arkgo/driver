@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
+	. "github.com/arkgo/asset"
 	"github.com/arkgo/asset/util"
-	. "github.com/arkgo/base"
 )
 
 type (

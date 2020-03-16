@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/arkgo/ark"
+	. "github.com/arkgo/asset"
 	"github.com/arkgo/asset/log"
 	"github.com/arkgo/asset/util"
-	. "github.com/arkgo/base"
 )
 
 //默认logger驱动
