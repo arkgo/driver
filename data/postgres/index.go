@@ -33,7 +33,6 @@ func Driver() ark.DataDriver {
 func init() {
 	driver := Driver()
 	for _, key := range DRIVERS {
-		ark.Debug("ddr", key)
 		ark.Register(key, driver)
 	}
 }
