@@ -15,13 +15,14 @@ type (
 func (drv *PostgresDriver) Connect(name string, config ark.DataConfig) (ark.DataConnect, error) {
 
 	//支持自定义的schema，相当于数据库名
-	schema := "public"
+
 	for _, s := range SCHEMAS {
 		if strings.HasPrefix(config.Url, s) {
 			config.Url = strings.Replace(config.Url, s, "postgres://", 1)
 		}
 	}
 
+	schema := "public"
 	if vv, ok := config.Setting["schema"].(string); ok && vv != "" {
 		schema = vv
 	}

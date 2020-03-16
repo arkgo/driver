@@ -14,10 +14,14 @@ var (
 		"cockroachdb://",
 		"cockroach://",
 		"crdb://",
+		"timescale://",
+		"timescaledb://",
+		"tsdb://",
 	}
 	DRIVERS = []string{
-		"postgresql", "postgres", "pgsql", "pg",
+		"postgresql", "postgres", "pgsql", "pgdb", "pg",
 		"cockroachdb", "cockroach", "crdb",
+		"timescaledb", "timescale", "tsdb",
 	}
 )
 
