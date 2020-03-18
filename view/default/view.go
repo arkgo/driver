@@ -371,6 +371,8 @@ func (parser *defaultViewParser) Render(name string, args ...Map) (string, error
 	}
 	data["model"] = renderModel
 
+	ark.Debug("vire.render", name, args, data)
+
 	e := t.Execute(buf, data)
 	if e != nil {
 		return "", errors.New(fmt.Sprintf("view %s parse error: %v", viewName, e))
