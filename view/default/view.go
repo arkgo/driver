@@ -371,7 +371,7 @@ func (parser *defaultViewParser) Render(name string, args ...Map) (string, error
 	}
 	data["model"] = renderModel
 
-	ark.Debug("vire.render", name, args, data)
+	ark.Debug("vire.render", name, args, data["model"])
 
 	e := t.Execute(buf, data)
 	if e != nil {
