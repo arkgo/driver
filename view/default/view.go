@@ -290,9 +290,9 @@ func (parser *defaultViewParser) Body(name string, args ...Any) (string, error) 
 }
 
 /* 返回view */
-func (parser *defaultViewParser) Render(name string, args ...Map) (string, error) {
+func (parser *defaultViewParser) Render(name string, args ...Any) (string, error) {
 
-	var renderModel Map
+	var renderModel Any
 	if len(args) > 0 {
 		renderModel = args[0]
 	}
@@ -371,8 +371,6 @@ func (parser *defaultViewParser) Render(name string, args ...Map) (string, error
 	}
 	data["model"] = renderModel
 
-	ark.Debug("vire.render", name, args, data["model"])
-
 	e := t.Execute(buf, data)
 	if e != nil {
 		return "", errors.New(fmt.Sprintf("view %s parse error: %v", viewName, e))
@@ -426,22 +424,24 @@ func (parser *defaultViewParser) bodyHelper() template.HTML {
 }
 
 func (parser *defaultViewParser) renderHelper(name string, vals ...Any) template.HTML {
-	args := []Map{}
-	for _, v := range vals {
-		if t, ok := v.(string); ok {
-			m := Map{}
-			e := ark.Unmarshal([]byte(t), &m)
-			if e == nil {
-				args = append(args, m)
-			}
-		} else if t, ok := v.(Map); ok {
-			args = append(args, t)
-		} else {
+	// args := []Map{}
+	// for _, v := range vals {
+	// 	if t, ok := v.(string); ok {
+	// 		m := Map{}
+	// 		e := ark.Unmarshal([]byte(t), &m)
+	// 		if e == nil {
+	// 			args = append(args, m)
+	// 		}
+	// 	} else if t, ok := v.(Map); ok {
+	// 		args = append(args, t)
+	// 	} else if ts, ok := v.([]Map); ok {
+	// 		args = append(args, ts...)
+	// 	} else {
 
-		}
-	}
+	// 	}
+	// }
 
-	s, e := parser.Render(name, args...)
+	s, e := parser.Render(name, vals...)
 	if e == nil {
 		return template.HTML(s)
 	} else {

@@ -193,8 +193,8 @@ func (base *PostgresBase) Table(name string) ark.DataTable {
 			key = config.Key
 		}
 
-		fields := ark.Params{
-			"$count": ark.Param{Type: "int", Require: false, Name: "统计"},
+		fields := Vars{
+			"$count": Var{Type: "int", Require: false, Name: "统计"},
 		}
 		for k, v := range config.Fields {
 			fields[k] = v
@@ -225,8 +225,8 @@ func (base *PostgresBase) View(name string) ark.DataView {
 			key = config.Key
 		}
 
-		fields := ark.Params{
-			"$count": ark.Param{Type: "int", Require: false, Name: "统计"},
+		fields := Vars{
+			"$count": Var{Type: "int", Require: false, Name: "统计"},
 		}
 		for k, v := range config.Fields {
 			fields[k] = v
@@ -254,8 +254,8 @@ func (base *PostgresBase) Model(name string) ark.DataModel {
 			key = config.Key
 		}
 
-		fields := ark.Params{
-			"$count": ark.Param{Type: "int", Require: false, Name: "统计"},
+		fields := Vars{
+			"$count": Var{Type: "int", Require: false, Name: "统计"},
 		}
 		for k, v := range config.Fields {
 			fields[k] = v

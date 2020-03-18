@@ -10,11 +10,11 @@ import (
 type (
 	PostgresModel struct {
 		base   *PostgresBase
-		name   string     //模型名称
-		schema string     //架构名
-		model  string     //这里可能是表名，视图名，或是集合名（mongodb)
-		key    string     //主键
-		fields ark.Params //字段定义
+		name   string //模型名称
+		schema string //架构名
+		model  string //这里可能是表名，视图名，或是集合名（mongodb)
+		key    string //主键
+		fields Vars   //字段定义
 	}
 )
 
