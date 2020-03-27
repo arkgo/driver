@@ -15,5 +15,5 @@ func Driver(ss ...string) ark.SessionDriver {
 func init() {
 	ark.Register("buntdb", Driver())
 	ark.Register("memory", Driver())
-	ark.Register("file", Driver(""))
+	ark.Register("file", Driver("store/session.db"))
 }
