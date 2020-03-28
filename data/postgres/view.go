@@ -339,9 +339,16 @@ func (view *PostgresView) Group(field string, args ...Any) []Map {
 		return []Map{}
 	}
 
+	if orderby == "" {
+		orderby = `ORDER BY "$count" DESC`
+	}
+
 	keys := []string{field, "$count"}
 
-	sql := fmt.Sprintf(`SELECT "%s",count("%s") FROM "%s"."%s" WHERE %s GROUP BY "%s" %s`, field, field, view.schema, view.view, where, field, orderby)
+	sql := fmt.Sprintf(`SELECT "%s",count("%s") as "$count" FROM "%s"."%s" WHERE %s GROUP BY "%s" %s`, field, field, view.schema, view.view, where, field, orderby)
+	// if limit > 0 {
+	// 	sql += fmt.Sprintf(` LIMIT %d`, limit)
+	// }
 	rows, err := exec.Query(sql, builds...)
 	if err != nil {
 		view.base.errorHandler("data.group.query", err, view.name, sql)
