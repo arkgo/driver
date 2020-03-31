@@ -117,16 +117,34 @@ func (table *PostgresTable) Change(item Map, data Map) Map {
 		} else if k == INC {
 			if vm, ok := v.(Map); ok {
 				for kk, vv := range vm {
-					vals = append(vals, vv)
-					sets = append(sets, fmt.Sprintf(`"%s"="%s"+$%d`, kk, kk, i))
-					i++
+					dots := strings.Split(kk, ".")
+					if len(dots) >= 2 {
+						//有.表示是JSONB字段
+						field, json := dots[0], dots[1]
+						vals = append(vals, vv)
+						sets = append(sets, fmt.Sprintf(`"%s"="%s"||jsonb_build_object('%s', COALESCE(("%s"->>'%s')::int8, 0)+$%d)`, field, field, json, field, json, i))
+						i++
+					} else {
+						vals = append(vals, vv)
+						sets = append(sets, fmt.Sprintf(`"%s"="%s"+$%d`, kk, kk, i))
+						i++
+					}
 				}
 			}
 		} else {
 			//keys = append(keys, k)
-			vals = append(vals, v)
-			sets = append(sets, fmt.Sprintf(`"%s"=$%d`, k, i))
-			i++
+
+			dots := strings.Split(k, ".")
+			if len(dots) >= 2 {
+				field, json := dots[0], dots[1]
+				vals = append(vals, v)
+				sets = append(sets, fmt.Sprintf(`"%s"="%s"||jsonb_build_object('%s', $%d)`, field, field, json, i))
+				i++
+			} else {
+				sets = append(sets, fmt.Sprintf(`"%s"=$%d`, k, i))
+				vals = append(vals, v)
+				i++
+			}
 		}
 	}
 	//条件是主键
@@ -421,16 +439,33 @@ func (table *PostgresTable) Update(update Map, args ...Any) int64 {
 		} else if k == INC {
 			if vm, ok := v.(Map); ok {
 				for kk, vv := range vm {
-					vals = append(vals, vv)
-					sets = append(sets, fmt.Sprintf(`"%s"="%s"+$%d`, kk, kk, i))
-					i++
+					dots := strings.Split(kk, ".")
+					if len(dots) >= 2 {
+						//有.表示是JSONB字段
+						field, json := dots[0], dots[1]
+						vals = append(vals, vv)
+						sets = append(sets, fmt.Sprintf(`"%s"="%s"||jsonb_build_object('%s', COALESCE(("%s"->>'%s')::int8, 0)+$%d)`, field, field, json, field, json, i))
+						i++
+					} else {
+						vals = append(vals, vv)
+						sets = append(sets, fmt.Sprintf(`"%s"="%s"+$%d`, kk, kk, i))
+						i++
+					}
 				}
 			}
 		} else {
 			//keys = append(keys, k)
-			vals = append(vals, v)
-			sets = append(sets, fmt.Sprintf(`"%s"=$%d`, k, i))
-			i++
+			dots := strings.Split(k, ".")
+			if len(dots) >= 2 {
+				field, json := dots[0], dots[1]
+				vals = append(vals, v)
+				sets = append(sets, fmt.Sprintf(`"%s"="%s"||jsonb_build_object('%s', $%d)`, field, field, json, i))
+				i++
+			} else {
+				sets = append(sets, fmt.Sprintf(`"%s"=$%d`, k, i))
+				vals = append(vals, v)
+				i++
+			}
 		}
 	}
 
