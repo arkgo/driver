@@ -454,6 +454,10 @@ func (table *PostgresTable) Update(update Map, args ...Any) int64 {
 				}
 			}
 		} else {
+
+			//UPDATE test SET "count"=jsonb_set("count", '{views}',  (COALESCE(("count"->>'views')::int8,0)+1)::text::jsonb);
+			//考虑支持多段JSON，比如 Update(Map{ "a.b.c.d": 123 })
+
 			//keys = append(keys, k)
 			dots := strings.Split(k, ".")
 			if len(dots) >= 2 {
