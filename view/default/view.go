@@ -101,6 +101,9 @@ func (connect *defaultViewConnect) newDefaultViewParser(body ark.ViewBody) *defa
 	//系统自动的函数库，
 	helpers["layout"] = parser.layoutHelper
 	helpers["title"] = parser.titleHelper
+	helpers["author"] = parser.authorHelper
+	helpers["keywords"] = parser.keywordsHelper
+	helpers["description"] = parser.descriptionHelper
 	helpers["body"] = parser.bodyHelper
 	helpers["render"] = parser.renderHelper
 	helpers["meta"] = parser.metaHelper
@@ -414,6 +417,45 @@ func (parser *defaultViewParser) titleHelper(args ...string) template.HTML {
 	} else {
 		if parser.title != "" {
 			return template.HTML(parser.title)
+		} else {
+			return template.HTML("")
+		}
+	}
+}
+func (parser *defaultViewParser) authorHelper(args ...string) template.HTML {
+	if len(args) > 0 {
+		//设置author
+		parser.author = args[0]
+		return template.HTML("")
+	} else {
+		if parser.author != "" {
+			return template.HTML(parser.author)
+		} else {
+			return template.HTML("")
+		}
+	}
+}
+func (parser *defaultViewParser) keywordsHelper(args ...string) template.HTML {
+	if len(args) > 0 {
+		//设置TITLE
+		parser.keywords = args[0]
+		return template.HTML("")
+	} else {
+		if parser.keywords != "" {
+			return template.HTML(parser.keywords)
+		} else {
+			return template.HTML("")
+		}
+	}
+}
+func (parser *defaultViewParser) descriptionHelper(args ...string) template.HTML {
+	if len(args) > 0 {
+		//设置TITLE
+		parser.description = args[0]
+		return template.HTML("")
+	} else {
+		if parser.description != "" {
+			return template.HTML(parser.description)
 		} else {
 			return template.HTML("")
 		}
