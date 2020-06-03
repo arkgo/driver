@@ -30,7 +30,7 @@ func (model *PostgresModel) First(args ...Any) Map {
 		return nil
 	}
 
-	exec, err := model.base.beginTx()
+	exec, err := model.base.beginExec()
 	if err != nil {
 		model.base.errorHandler("model.first.begin", err, model.name)
 		return nil
@@ -90,7 +90,7 @@ func (model *PostgresModel) Query(args ...Any) []Map {
 		return []Map{}
 	}
 
-	exec, err := model.base.beginTx()
+	exec, err := model.base.beginExec()
 	if err != nil {
 		model.base.errorHandler("model.query.begin", err, model.name)
 		return []Map{}

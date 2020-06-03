@@ -24,7 +24,8 @@ type (
 		name   string
 		schema string
 
-		tx *sql.Tx
+		tx   *sql.Tx
+		exec PostgresExecutor
 		// cache ark.CacheBase
 
 		//是否手动提交事务，否则为自动
@@ -142,7 +143,7 @@ func (base *PostgresBase) Erred() error {
 //ID生成器
 func (base *PostgresBase) Serial(key string, start, step int64) int64 {
 
-	exec, err := base.beginTx()
+	exec, err := base.beginExec()
 	if err != nil {
 		base.errorHandler("data.serial", err, key)
 		return 0
@@ -279,37 +280,43 @@ func (base *PostgresBase) Model(name string) ark.DataModel {
 //开启手动模式
 func (base *PostgresBase) Begin() (*sql.Tx, error) {
 	base.lastError = nil
-
-	if _, err := base.beginTx(); err != nil {
-		return nil, err
-	}
-
 	base.manual = true
-	return base.tx, nil
+	return base.beginTx()
 }
 
 //注意，此方法为实际开始事务
-func (base *PostgresBase) beginTx() (PostgresExecutor, error) {
-	if base.manual {
-		if base.tx == nil {
-			tx, err := base.connect.db.Begin()
-			if err != nil {
-				return nil, err
-			}
-			base.tx = tx
-		}
+func (base *PostgresBase) beginTx() (*sql.Tx, error) {
+	if base.tx != nil {
 		return base.tx, nil
-	} else {
-		return base.connect.db, nil
 	}
+
+	tx, err := base.connect.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	base.tx = tx
+	base.exec = tx
+
+	return tx, err
 }
 
 //此为取消事务
 func (base *PostgresBase) endTx() error {
 	base.tx = nil
+	base.exec = nil
 	base.manual = false
 	base.triggers = []postgresTrigger{}
 	return nil
+}
+
+func (base *PostgresBase) beginExec() (PostgresExecutor, error) {
+	if base.manual {
+		base.beginTx()
+		return base.exec, nil
+	} else {
+		return base.connect.db, nil
+	}
 }
 
 //提交事务

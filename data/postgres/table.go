@@ -50,7 +50,7 @@ func (table *PostgresTable) Create(data Map) Map {
 		i++
 	}
 
-	exec, err := table.base.beginTx()
+	exec, err := table.base.beginExec()
 	if err != nil {
 		table.base.errorHandler("data.create.begin", err, table.name)
 		return nil
@@ -151,7 +151,7 @@ func (table *PostgresTable) Change(item Map, data Map) Map {
 	vals = append(vals, item[table.key])
 
 	//开启事务
-	exec, err := table.base.beginTx()
+	exec, err := table.base.beginExec()
 	if err != nil {
 		table.base.errorHandler("data.change.begin", err, table.name)
 		return nil
@@ -214,7 +214,7 @@ func (table *PostgresTable) Change(item Map, data Map) Map {
 //	}
 //
 //	//开启事务
-//	exec, err := table.base.beginTx()
+//	exec, err := table.base.beginExec()
 //	if err != nil {
 //		table.base.errorHandler("data.remove.begin", err, table.name)
 //		return int64(0)
@@ -276,7 +276,7 @@ func (table *PostgresTable) Change(item Map, data Map) Map {
 //	}
 //
 //	//开启事务
-//	exec, err := table.base.beginTx()
+//	exec, err := table.base.beginExec()
 //	if err != nil {
 //		table.base.errorHandler("data.recover.begin", err, table.name)
 //		return int64(0)
@@ -337,7 +337,7 @@ func (table *PostgresTable) Remove(args ...Any) Map {
 	}
 
 	//开启事务
-	exec, err := table.base.beginTx()
+	exec, err := table.base.beginExec()
 	if err != nil {
 		table.base.errorHandler("data.remove.begin", err, table.name)
 		return nil
@@ -370,7 +370,7 @@ func (table *PostgresTable) Delete(args ...Any) int64 {
 	}
 
 	//开启事务
-	exec, err := table.base.beginTx()
+	exec, err := table.base.beginExec()
 	if err != nil {
 		table.base.errorHandler("data.delete.begin", err, table.name)
 		return int64(0)
@@ -486,7 +486,7 @@ func (table *PostgresTable) Update(update Map, args ...Any) int64 {
 	}
 
 	//开启事务
-	exec, err := table.base.beginTx()
+	exec, err := table.base.beginExec()
 	if err != nil {
 		table.base.errorHandler("data.update.begin", err, table.name)
 		return int64(0)

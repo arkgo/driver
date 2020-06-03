@@ -56,7 +56,7 @@ func (view *PostgresView) Count(args ...Any) float64 {
 		return float64(0)
 	}
 
-	exec, err := view.base.beginTx()
+	exec, err := view.base.beginExec()
 	if err != nil {
 		view.base.errorHandler("data.count.begin", err, view.name)
 		return float64(0)
@@ -115,7 +115,7 @@ func (view *PostgresView) First(args ...Any) Map {
 	}
 
 	//获取
-	exec, err := view.base.beginTx()
+	exec, err := view.base.beginExec()
 	if err != nil {
 		view.base.errorHandler("data.first.begin", err, view.name)
 		return nil
@@ -180,7 +180,7 @@ func (view *PostgresView) Query(args ...Any) []Map {
 		return []Map{}
 	}
 
-	exec, err := view.base.beginTx()
+	exec, err := view.base.beginExec()
 	if err != nil {
 		view.base.errorHandler("data.query.begin", err, view.name)
 		return []Map{}
@@ -248,7 +248,7 @@ func (view *PostgresView) Limit(offset, limit Any, args ...Any) (int64, []Map) {
 	}
 
 	//开启事务
-	exec, err := view.base.beginTx()
+	exec, err := view.base.beginExec()
 	if err != nil {
 		view.base.errorHandler("data.limit.begin", err, view.name)
 		return int64(0), []Map{}
@@ -333,7 +333,7 @@ func (view *PostgresView) Group(field string, args ...Any) []Map {
 		return []Map{}
 	}
 
-	exec, err := view.base.beginTx()
+	exec, err := view.base.beginExec()
 	if err != nil {
 		view.base.errorHandler("data.group.begin", err, view.name)
 		return []Map{}
@@ -405,7 +405,7 @@ func (view *PostgresView) Group(field string, args ...Any) []Map {
 //		return []Map{}
 //	}
 //
-//	exec, err := view.base.beginTx()
+//	exec, err := view.base.beginExec()
 //	if err != nil {
 //		view.base.errorHandler("data.group.begin", err, view.name)
 //		return []Map{}
@@ -466,7 +466,7 @@ func (view *PostgresView) Entity(id Any) Map {
 	view.base.lastError = nil
 
 	//开启事务
-	exec, err := view.base.beginTx()
+	exec, err := view.base.beginExec()
 	if err != nil {
 		view.base.errorHandler("data.entity.begin", err, view.name)
 		return nil

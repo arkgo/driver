@@ -55,5 +55,5 @@ func (connect *PostgresConnect) Base() ark.DataBase {
 	connect.actives++
 	connect.mutex.Unlock()
 
-	return &PostgresBase{connect, connect.name, connect.schema, nil, false, []postgresTrigger{}, nil}
+	return &PostgresBase{connect, connect.name, connect.schema, nil, nil, false, []postgresTrigger{}, nil}
 }
