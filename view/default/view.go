@@ -298,6 +298,8 @@ func (parser *defaultViewParser) Render(name string, args ...Any) (string, error
 	var renderModel Any
 	if len(args) > 0 {
 		renderModel = args[0]
+	} else {
+		renderModel = make(Map)
 	}
 
 	var viewName, renderHtml string
