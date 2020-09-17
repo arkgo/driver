@@ -54,9 +54,10 @@ func (driver *fileSessionDriver) Connect(name string, config ark.SessionConfig) 
 
 	if vv, ok := config.Setting["file"].(string); ok && vv != "" {
 		setting.Store = vv
-	}
-	if vv, ok := config.Setting["store"].(string); ok && vv != "" {
+	} else if vv, ok := config.Setting["store"].(string); ok && vv != "" {
 		setting.Store = vv
+	} else {
+		setting.Store = "store/session.db"
 	}
 
 	return &fileSessionConnect{
@@ -67,7 +68,7 @@ func (driver *fileSessionDriver) Connect(name string, config ark.SessionConfig) 
 //打开连接
 func (connect *fileSessionConnect) Open() error {
 	if connect.setting.Store == "" {
-		return errors.New("无效缓存存储")
+		return errors.New("无效会员存储")
 	}
 	db, err := buntdb.Open(connect.setting.Store)
 	if err != nil {
