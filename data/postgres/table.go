@@ -496,7 +496,7 @@ func (table *PostgresTable) Update(update Map, args ...Any) int64 {
 	sql := fmt.Sprintf(`UPDATE "%s"."%s" SET %s WHERE %s`, table.schema, table.view, strings.Join(sets, `,`), where)
 	result, err := exec.Exec(sql, vals...)
 	if err != nil {
-		table.base.errorHandler("data.update.begin", err, table.name, sql, vals)
+		table.base.errorHandler("data.update.exec", err, table.name, sql, vals)
 		return int64(0)
 	}
 
